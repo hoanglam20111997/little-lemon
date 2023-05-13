@@ -1,30 +1,36 @@
 package com.example.littlelemon
 
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.littlelemon.ui.theme.PrimaryColor1
-import com.example.littlelemon.ui.theme.PrimaryColor2
-import com.example.littlelemon.ui.theme.SecondaryColor3
-import com.example.littlelemon.ui.theme.SecondaryColor4
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.littlelemon.ui.theme.*
 
 @Composable
-fun Onboarding() {
+fun Onboarding(navController: NavController, sharedPreferences: SharedPreferences) {
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -37,7 +43,6 @@ fun Onboarding() {
                 .width(200.dp)
                 .height(100.dp)
         )
-        
 
         Box(
             contentAlignment = Alignment.Center,
@@ -60,6 +65,7 @@ fun Onboarding() {
             )
         }
 
+        // Personal information
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -77,60 +83,152 @@ fun Onboarding() {
             )
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 15.dp, top = 0.dp, bottom = 20.dp)
-        ) {
-            TextField(
-                value = "",
-                onValueChange = {
-
-                },
-                label = { Text(stringResource(id = R.string.first_name_onboarding)) },
-                placeholder = { Text(text = "Tilly") },
-
-                modifier = Modifier.fillMaxWidth()
-            )
+        // First name
+        var firstNameTxt by remember {
+            mutableStateOf("")
         }
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 15.dp, top = 0.dp, bottom = 20.dp)
+                .padding(start = 20.dp, end = 15.dp, top = 0.dp, bottom = 30.dp)
         ) {
-            TextField(
-                value = "",
-                onValueChange = {
+            var firstNameTxt by remember {
+                mutableStateOf("")
+            }
 
-                },
-                label = { Text(stringResource(id = R.string.last_name_onboarding)) },
-                placeholder = { Text(text = "Doe") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column (
+
+            ) {
+                Text(
+                    stringResource(id = R.string.first_name_onboarding),
+                    style = TextStyle(
+                        fontSize = 10.sp,
+                        color = SecondaryColor4,
+                    ),
+                    fontFamily = FontFamily.SansSerif,
+//                    fontFamily = MyCustomFont,
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier
+                        .height(24.dp)
+                )
+                OutlinedTextField(
+                    value = firstNameTxt,
+                    onValueChange = {
+                        firstNameTxt = it
+                    },
+                    singleLine = true,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        unfocusedBorderColor = Color.Gray,
+                    ),
+                    placeholder = { Text(fontSize = 15.sp ,text = "Tilly", color = Color.Gray)},
+                    shape = RoundedCornerShape(6.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
+        }
+
+        // Last name
+        var lastNameTxt by remember {
+            mutableStateOf("")
         }
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 15.dp, top = 0.dp, bottom = 20.dp)
+                .padding(start = 20.dp, end = 15.dp, top = 0.dp, bottom = 30.dp)
         ) {
-            TextField(
-                value = "",
-                onValueChange = {
+            Column(
 
-                },
-                label = { Text(stringResource(id = R.string.email_onboarding)) },
-                placeholder = { Text(text = "tillydoe@example.com") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            ) {
+                Text(
+                    stringResource(id = R.string.last_name_onboarding),
+                    style = TextStyle(
+                        fontSize = 10.sp,
+                        color = SecondaryColor4,
+                    ),
+                    fontFamily = FontFamily.SansSerif,
+//                    fontFamily = MyCustomFont,
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier
+                        .height(24.dp)
+                )
+                OutlinedTextField(
+                    value = lastNameTxt,
+                    onValueChange = {
+                        lastNameTxt = it
+                    },
+                    singleLine = true,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        unfocusedBorderColor = Color.Gray,
+                    ),
+                    placeholder = { Text(fontSize = 15.sp ,text = "Doe", color = Color.Gray) },
+                    shape = RoundedCornerShape(6.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
+        }
+
+        // Email
+        var emailTxt by remember {
+            mutableStateOf("")
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 15.dp, top = 0.dp, bottom = 30.dp)
+        ) {
+            Column(
+
+            ) {
+                Text(
+                    stringResource(id = R.string.email_onboarding),
+                    style = TextStyle(
+                        fontSize = 10.sp,
+                        color = SecondaryColor4,
+                    ),
+                    fontFamily = FontFamily.SansSerif,
+//                    fontFamily = MyCustomFont,
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier
+                        .height(24.dp)
+                )
+                OutlinedTextField(
+                    value = emailTxt,
+                    onValueChange = {
+                        emailTxt = it
+                    },
+                    singleLine = true,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        unfocusedBorderColor = Color.Gray,
+                    ),
+                    placeholder = { Text(fontSize = 15.sp ,text = "tillydoe@example.com", color = Color.Gray) },
+                    shape = RoundedCornerShape(6.dp),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
         }
 
         Button(
-            onClick = { },
+            onClick = {
+                val editor = sharedPreferences.edit()
+                editor.putString("firstName", firstNameTxt)
+                editor.putString("lastName", lastNameTxt)
+                editor.putString("email", emailTxt)
+                editor.apply()
+
+                navController.navigate(Home.route)
+            },
             shape = RoundedCornerShape(6.dp),
             colors = ButtonDefaults.buttonColors(backgroundColor = PrimaryColor2),
-            modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 15.dp, top = 70.dp, bottom = 20.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 15.dp, top = 70.dp, bottom = 20.dp)
         ) {
             Text(
                 stringResource(id = R.string.button_register_onboarding),
@@ -144,6 +242,9 @@ fun Onboarding() {
 
 @Preview(showBackground = true)
 @Composable
-fun OnboardPreview() {
-    Onboarding()
+fun OnboardingPreview() {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("LittleLemon", Context.MODE_PRIVATE)
+
+    Onboarding(navController = rememberNavController(), sharedPreferences = prefs)
 }
