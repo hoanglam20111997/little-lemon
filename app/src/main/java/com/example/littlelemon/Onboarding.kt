@@ -2,10 +2,13 @@ package com.example.littlelemon
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -28,8 +31,18 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.littlelemon.ui.theme.*
 
+
 @Composable
-fun Onboarding(navController: NavController, sharedPreferences: SharedPreferences) {
+fun Onboarding(navController: NavController) {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("LittleLemon", Context.MODE_PRIVATE)
+
+    var firstNameTxt by remember {mutableStateOf("")}
+    var lastNameTxt by remember {mutableStateOf("")}
+    var emailTxt by remember {mutableStateOf("")}
+
+    var errorMessage by remember { mutableStateOf("") }
+    var successMessage by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -61,7 +74,7 @@ fun Onboarding(navController: NavController, sharedPreferences: SharedPreference
                     color = SecondaryColor3,
                 ),
                 textAlign = TextAlign.Center,
-                fontFamily = FontFamily.SansSerif,
+                fontFamily = karla_regular,
             )
         }
 
@@ -78,36 +91,25 @@ fun Onboarding(navController: NavController, sharedPreferences: SharedPreference
                     color = SecondaryColor4,
                     fontWeight = FontWeight.Bold,
                 ),
-                fontFamily = FontFamily.SansSerif,
+                fontFamily = karla_regular,
                 textAlign = TextAlign.Left,
             )
         }
 
         // First name
-        var firstNameTxt by remember {
-            mutableStateOf("")
-        }
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 15.dp, top = 0.dp, bottom = 30.dp)
         ) {
-            var firstNameTxt by remember {
-                mutableStateOf("")
-            }
-
-            Column (
-
-            ) {
+            Column {
                 Text(
                     stringResource(id = R.string.first_name_onboarding),
                     style = TextStyle(
                         fontSize = 10.sp,
                         color = SecondaryColor4,
                     ),
-                    fontFamily = FontFamily.SansSerif,
-//                    fontFamily = MyCustomFont,
+                    fontFamily = karla_regular,
                     textAlign = TextAlign.Left,
                     modifier = Modifier
                         .height(24.dp)
@@ -118,6 +120,7 @@ fun Onboarding(navController: NavController, sharedPreferences: SharedPreference
                         firstNameTxt = it
                     },
                     singleLine = true,
+                    textStyle = TextStyle(fontFamily = karla_regular,),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         unfocusedBorderColor = Color.Gray,
                     ),
@@ -130,26 +133,19 @@ fun Onboarding(navController: NavController, sharedPreferences: SharedPreference
         }
 
         // Last name
-        var lastNameTxt by remember {
-            mutableStateOf("")
-        }
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 15.dp, top = 0.dp, bottom = 30.dp)
         ) {
-            Column(
-
-            ) {
+            Column {
                 Text(
                     stringResource(id = R.string.last_name_onboarding),
                     style = TextStyle(
                         fontSize = 10.sp,
                         color = SecondaryColor4,
                     ),
-                    fontFamily = FontFamily.SansSerif,
-//                    fontFamily = MyCustomFont,
+                    fontFamily = karla_regular,
                     textAlign = TextAlign.Left,
                     modifier = Modifier
                         .height(24.dp)
@@ -160,6 +156,7 @@ fun Onboarding(navController: NavController, sharedPreferences: SharedPreference
                         lastNameTxt = it
                     },
                     singleLine = true,
+                    textStyle = TextStyle(fontFamily = karla_regular,),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         unfocusedBorderColor = Color.Gray,
                     ),
@@ -172,26 +169,19 @@ fun Onboarding(navController: NavController, sharedPreferences: SharedPreference
         }
 
         // Email
-        var emailTxt by remember {
-            mutableStateOf("")
-        }
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 15.dp, top = 0.dp, bottom = 30.dp)
         ) {
-            Column(
-
-            ) {
+            Column {
                 Text(
                     stringResource(id = R.string.email_onboarding),
                     style = TextStyle(
                         fontSize = 10.sp,
                         color = SecondaryColor4,
                     ),
-                    fontFamily = FontFamily.SansSerif,
-//                    fontFamily = MyCustomFont,
+                    fontFamily = karla_regular,
                     textAlign = TextAlign.Left,
                     modifier = Modifier
                         .height(24.dp)
@@ -202,6 +192,7 @@ fun Onboarding(navController: NavController, sharedPreferences: SharedPreference
                         emailTxt = it
                     },
                     singleLine = true,
+                    textStyle = TextStyle(fontFamily = karla_regular,),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         unfocusedBorderColor = Color.Gray,
                     ),
@@ -214,37 +205,80 @@ fun Onboarding(navController: NavController, sharedPreferences: SharedPreference
             }
         }
 
-        Button(
-            onClick = {
-                val editor = sharedPreferences.edit()
-                editor.putString("firstName", firstNameTxt)
-                editor.putString("lastName", lastNameTxt)
-                editor.putString("email", emailTxt)
-                editor.apply()
-
-                navController.navigate(Home.route)
-            },
-            shape = RoundedCornerShape(6.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = PrimaryColor2),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 15.dp, top = 70.dp, bottom = 20.dp)
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
         ) {
-            Text(
-                stringResource(id = R.string.button_register_onboarding),
-                fontSize = 18.sp,
-                color = SecondaryColor4
-            )
-        }
+            if (errorMessage.isNotEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        fontFamily = karla_regular,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
 
+                Spacer(modifier = Modifier.fillMaxSize().height(16.dp))
+            }
+
+            if (successMessage.isNotEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = successMessage,
+                        color = Color.Red,
+                        fontFamily = karla_regular,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+
+                Spacer(modifier = Modifier.fillMaxSize().height(16.dp))
+            }
+
+            Button(
+                onClick = {
+                    if ((firstNameTxt.isBlank() || lastNameTxt.isBlank() || emailTxt.isBlank())) {
+                        errorMessage = "Registration unsuccessful. Please enter all data."
+                        successMessage = ""
+                    } else {
+                        val editor = sharedPreferences.edit()
+                        editor.putString("firstName", firstNameTxt)
+                        editor.putString("lastName", lastNameTxt)
+                        editor.putString("email", emailTxt)
+                        editor.apply()
+
+                        errorMessage = ""
+                        successMessage = "Registration successful!"
+
+                        navController.navigate(Home.route)
+                    }
+                },
+                shape = RoundedCornerShape(6.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = PrimaryColor2),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(start = 20.dp, end = 15.dp, top = 70.dp, bottom = 20.dp)
+            ) {
+                Text(
+                    stringResource(id = R.string.button_register_onboarding),
+                    fontSize = 18.sp,
+                    fontFamily = karla_regular,
+                    color = SecondaryColor4
+                )
+            }
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun OnboardingPreview() {
-    val context = LocalContext.current
-    val prefs = context.getSharedPreferences("LittleLemon", Context.MODE_PRIVATE)
-
-    Onboarding(navController = rememberNavController(), sharedPreferences = prefs)
+    Onboarding(navController = rememberNavController())
 }

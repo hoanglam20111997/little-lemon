@@ -7,4 +7,8 @@
     <string name="last_name_onboarding">Last name</string>
     <string name="email_onboarding">Email</string>
     <string name="button_register_onboarding">Register</string>
+    <string name="button_Logout_onboarding">Log out</string>'
+    <string name="brand_home">Little Lemon</string>
+    <string name="city_home">Chicago</string>
+    <string name="short_description_home">We are a family-owned Mediterranean restaurant, focused on traditional recipes served with a modern twist.</string>
 </resources>

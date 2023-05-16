@@ -47,7 +47,10 @@ fun LittleLemonTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Compo
     )
 }
 
-val MyCustomFont = FontFamily(
-    Font(R.font.markazi_text_medium),
-    Font(R.font.markazi_text_bold, FontWeight.Bold)
+val karla_regular = FontFamily(
+    Font(R.font.karla_regular)
+)
+
+val markazitext_regular = FontFamily(
+    Font(R.font.markazitext_regular)
 )
