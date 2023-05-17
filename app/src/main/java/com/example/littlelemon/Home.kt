@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -64,6 +66,9 @@ fun HomeScreen(navController: NavController, database: AppDatabase) {
         databaseMenuItems
     }
 
+    val categoryNames: List<String> = menuItems.map { it.category }.distinct()
+    var selectedCategory by remember { mutableStateOf("") }
+
     var searchPhrase by remember { mutableStateOf("") }
 
     Column(
@@ -78,7 +83,7 @@ fun HomeScreen(navController: NavController, database: AppDatabase) {
         ) {
 
             Box(
-                modifier = Modifier.fillMaxWidth(0.75f),
+                modifier = Modifier.fillMaxWidth(0.72f),
                 contentAlignment = Alignment.CenterEnd
             ) {
                 Image(
@@ -176,17 +181,92 @@ fun HomeScreen(navController: NavController, database: AppDatabase) {
                         }
                     }
                 }
-                // Add OutlinedTextField
 
+                // Search bar
+                OutlinedTextField(
+                    value = searchPhrase,
+                    onValueChange = { searchPhrase = it },
+                    placeholder = { Text("Enter Search Phrase", color = SecondaryColor4) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search Icon",
+                            tint = SecondaryColor4
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp)
+                    ,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = SecondaryColor4,
+                        backgroundColor = SecondaryColor3,
+                        focusedBorderColor = PrimaryColor2,
+                        cursorColor = PrimaryColor2,
+                    ),
+                    shape = RoundedCornerShape(10.dp)
+                )
             }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 35.dp, start = 15.dp, end = 15.dp)
+            ,
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Column(
+
+            ) {
+                Text(
+                    text = stringResource(id = R.string.order_delivery_home),
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        color = Color.Black,
+                        fontFamily = karla_regular,
+                        fontWeight = FontWeight.ExtraBold,
+                    ),
+                )
+                Row {
+                    val capitalizedCategoryNames = categoryNames.map { it.replaceFirstChar(Char::uppercaseChar) }
+
+                    // Menu breakdown buttons
+                    capitalizedCategoryNames.forEach { categoryName ->
+                        Button(
+                            onClick = {
+                                if (selectedCategory == categoryName) {
+                                    selectedCategory = "";
+                                } else {
+                                    selectedCategory = categoryName
+                                }
+                            },
+                            modifier = Modifier.padding(8.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = if (categoryName == selectedCategory) Color.Gray else Color.LightGray,
+                                contentColor = Color.Black
+                            ),
+                            shape = RoundedCornerShape(15.dp)
+                        ) {
+                            Text(text = categoryName)
+                        }
+                    }
+                }
+            }
+        }
+
+        var filteredMenuItemsOrder = if (selectedCategory.isNotEmpty()) {
+            menuItems.filter{ it.category.contains(selectedCategory, ignoreCase = true)}
+        } else {
+            menuItems
         }
 
         if (searchPhrase.isNotEmpty()) {
             // Filter the menu items based on the search phrase
-            val filteredMenuItems = menuItems.filter { it.title.contains(searchPhrase, ignoreCase = true) }
+            val filteredMenuItems = filteredMenuItemsOrder.filter{ it.title.contains(searchPhrase, ignoreCase = true) }
             MenuItemsList(filteredMenuItems)
         } else {
-            MenuItemsList(menuItems)
+            MenuItemsList(filteredMenuItemsOrder)
         }
     }
 
@@ -271,14 +351,18 @@ private fun MenuItemsList(items: List<MenuItemRoom>) {
                         }
 
                         Box(
-                            modifier = Modifier.fillMaxWidth().padding(top = 0.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 0.dp),
                             contentAlignment = Alignment.CenterEnd
                         ) {
 
                             GlideImage(
                                 model = menuItem.image,
                                 contentDescription = "Image",
-                                modifier = Modifier.height(80.dp).width(80.dp),
+                                modifier = Modifier
+                                    .height(80.dp)
+                                    .width(80.dp),
                                 contentScale = ContentScale.Crop,
                             )
                         }
