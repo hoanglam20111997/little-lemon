@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -24,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,19 +59,21 @@ fun HomeScreen(navController: NavController, database: AppDatabase) {
     val databaseMenuItems by database.menuItemDao().getAll().observeAsState(emptyList())
 
     // add orderMenuItems variable here
-    var orderMenuItems by remember { mutableStateOf(false) }
+    var selectedCategory by remember { mutableStateOf("") }
+    var searchPhrase by remember { mutableStateOf("") }
 
     // add menuItems variable here
-    val menuItems = if (orderMenuItems) {
-        databaseMenuItems.sortedBy { it.title }
+    var menuItems = databaseMenuItems
+
+    var categoryNames: List<String> = menuItems.map { it.category }.distinct()
+
+    var filteredMenuItemsOrder = if (selectedCategory.isNotEmpty()) {
+        menuItems.filter{ it.category.contains(selectedCategory, ignoreCase = true)}
     } else {
-        databaseMenuItems
+        menuItems
     }
 
-    val categoryNames: List<String> = menuItems.map { it.category }.distinct()
-    var selectedCategory by remember { mutableStateOf("") }
-
-    var searchPhrase by remember { mutableStateOf("") }
+    var filteredMenuItems = filteredMenuItemsOrder.filter{ it.title.contains(searchPhrase, ignoreCase = true) }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -255,19 +259,7 @@ fun HomeScreen(navController: NavController, database: AppDatabase) {
             }
         }
 
-        var filteredMenuItemsOrder = if (selectedCategory.isNotEmpty()) {
-            menuItems.filter{ it.category.contains(selectedCategory, ignoreCase = true)}
-        } else {
-            menuItems
-        }
-
-        if (searchPhrase.isNotEmpty()) {
-            // Filter the menu items based on the search phrase
-            val filteredMenuItems = filteredMenuItemsOrder.filter{ it.title.contains(searchPhrase, ignoreCase = true) }
-            MenuItemsList(filteredMenuItems)
-        } else {
-            MenuItemsList(filteredMenuItemsOrder)
-        }
+        MenuItemsList(filteredMenuItems)
     }
 
     LaunchedEffect(Unit) {
